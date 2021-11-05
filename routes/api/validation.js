@@ -1,45 +1,45 @@
 const Joi = require('joi');
 
-const schemaContact = Joi.object({
-  name: Joi.string().min(3).required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string()
-    .pattern(new RegExp('^.[0-9]{3}. [0-9]{3}-[0-9]{4}$'))
+const schemaCreateContact = Joi.object({
+  name: Joi.string().min(3).max(30).required(),
+  phone: Joi.number().integer().min(3).max(9999999999).required(),
+
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ['com', 'net', 'ua', 'ru'] },
+    })
     .required(),
 });
 
-const validateContact = async (schema, obj, res, next) => {
+const schemaUpdateContact = Joi.object({
+  name: Joi.string().min(3).max(30).optional(),
+
+  phone: Joi.number().integer().min(3).max(9999999999).optional(),
+
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ['com', 'net', 'ua', 'ru'] },
+    })
+    .optional(),
+}).or('name', 'phone', 'email');
+
+const validate = async (schema, obj, next) => {
   try {
-    await schema.validateAsync(obj)
-    next()
-  } catch (error) {
-    res.status(400)
-      .json({
-        status: 'error',
-        code: 400,
-        message: 'missing required name field'
-      })
+    await schema.validateAsync(obj);
+    return next();
+  } catch (err) {
+    console.log(err);
+    next({ status: 400, message: err.message.replace(/"/g, "'") });
   }
 };
 
-const validateBody = async (schema, obj, res, next) => {
-  try {
-    await schema.validateAsync(obj)
-    next()
-  } catch (error) {
-    res.status(400)
-      .json({
-        status: 'error',
-        code: 400,
-        message: 'missing fields'
-      })
-  }
-};
-
-module.exports.validateContact = async (req, res, next) => {
-  return await validateContact(schemaContact, req.body, res, next)
-};
-
-module.exports.validateBody = async (req, res, next) => {
-  return await validateBody(schemaContact, req.body, res, next)
+module.exports = {
+  validateContact: async (req, res, next) => {
+    return await validate(schemaCreateContact, req.body, next);
+  },
+  validateBody: async (req, res, next) => {
+    return await validate(schemaUpdateContact, req.body, next);
+  },
 };

@@ -8,13 +8,13 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   const contacts = await db.readData()
-  const [contact] = contacts.filter((contact) => contact.id === Number(contactId))
+  const contact = contacts.find((contact) => contact.id === Number(contactId))
   return contact;
 }
 
 const removeContact = async (contactId) => {
   const contacts = await db.readData()
-  const index = contacts.findIndex((contact) => contact.id === Number(contactId))
+  const index = contacts.findIndex((contact) => contact.id === contactId)
   if (index !== -1) {
     const [result] = contacts.splice(index, 1)
     await db.writeData(contacts)
