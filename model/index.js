@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const DataBase = require('./dataBase');
 const db = new DataBase('contacts.json');
 
@@ -14,7 +13,7 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   const contacts = await db.readData()
-  const index = contacts.findIndex((contact) => contact.id === contactId)
+  const index = contacts.findIndex((contact) => contact.id === Number(contactId))
   if (index !== -1) {
     const [result] = contacts.splice(index, 1)
     await db.writeData(contacts)
@@ -26,7 +25,7 @@ const removeContact = async (contactId) => {
 const addContact = async (body) => {
   const contacts = await db.readData()
   const newContact = {
-    id: crypto.randomUUID(),
+    id: Math.random(),
     ...body,
   }
   contacts.push(newContact);
