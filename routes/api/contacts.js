@@ -6,6 +6,7 @@ const {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact
 } = require('../../model');
 const { validateContact, validateBody } = require('./validation');
 
@@ -66,5 +67,20 @@ router.put('/:contactId', validateBody, async (req, res, next) => {
     next(error)
   }
 })
+
+router.patch(
+  '/:contactId/favorite', validateBody, async (req, res, next) => {
+    try {
+      const contact = await updateStatusContact(req.params.contactId, req.body);
+      if (contact) {
+        return res.status(201).json({ status: 'success', code: 201, data: { contact } });
+      } else {
+        return res.status(404).json({ status: 'error', code: 404, data: 'Not Found' });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 module.exports = router
