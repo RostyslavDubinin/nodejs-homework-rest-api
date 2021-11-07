@@ -1,5 +1,6 @@
 const DataBase = require('./dataBase');
 const db = new DataBase('contacts.json');
+const { v4: uuidv4 } = require('uuid');
 
 const listContacts = async () => {
   return await db.readData()
@@ -7,13 +8,13 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   const contacts = await db.readData()
-  const contact = contacts.find((contact) => contact.id === Number(contactId))
+  const contact = contacts.find((contact) => contact.id.toString() === contactId.toString())
   return contact;
 }
 
 const removeContact = async (contactId) => {
   const contacts = await db.readData()
-  const index = contacts.findIndex((contact) => contact.id === Number(contactId))
+  const index = contacts.findIndex((contact) => contact.id.toString() === contactId.toString())
   if (index !== -1) {
     const [result] = contacts.splice(index, 1)
     await db.writeData(contacts)
@@ -25,7 +26,7 @@ const removeContact = async (contactId) => {
 const addContact = async (body) => {
   const contacts = await db.readData()
   const newContact = {
-    id: Math.random(),
+    id: uuidv4(),
     ...body,
   }
   contacts.push(newContact);
@@ -35,7 +36,7 @@ const addContact = async (body) => {
 
 const updateContact = async (contactId, body) => {
   const contacts = await db.readData()
-  const index = contacts.findIndex((contact) => contact.id === Number(contactId))
+  const index = contacts.findIndex((contact) => contact.id.toString() === contactId.toString())
   if (index !== -1) {
     contacts[index] = { ...contacts[index], ...body }
     await db.writeData(contacts)
