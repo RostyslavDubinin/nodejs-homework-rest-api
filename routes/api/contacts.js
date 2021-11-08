@@ -69,7 +69,7 @@ router.put('/:contactId', validateBody, async (req, res, next) => {
 })
 
 router.patch(
-  '/:contactId/favorite', validateBody, async (req, res, next) => {
+  '/:contactId/favorite', async (req, res, next) => {
     try {
       const contact = await updateStatusContact(req.params.contactId, req.body);
       if (contact) {
