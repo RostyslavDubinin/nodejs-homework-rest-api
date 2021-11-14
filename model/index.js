@@ -1,49 +1,35 @@
-const DataBase = require('./dataBase');
-const db = new DataBase('contacts.json');
-const { v4: uuidv4 } = require('uuid');
+const Contacts = require('./schemas/contact');
 
 const listContacts = async () => {
-  return await db.readData()
-}
+  const result = await Contacts.find();
+  return result;
+};
 
-const getContactById = async (contactId) => {
-  const contacts = await db.readData()
-  const contact = contacts.find((contact) => contact.id.toString() === contactId.toString())
-  return contact;
-}
+const getContactById = async id => {
+  const result = await Contacts.findOne({_id: id})
+  return result
+};
 
-const removeContact = async (contactId) => {
-  const contacts = await db.readData()
-  const index = contacts.findIndex((contact) => contact.id.toString() === contactId.toString())
-  if (index !== -1) {
-    const [result] = contacts.splice(index, 1)
-    await db.writeData(contacts)
-    return result;
-  }
-  return null;
-}
+const removeContact = async id => {
+  const result = await Contacts.findByIdAndRemove({_id: id})
+  return result
+};
 
-const addContact = async (body) => {
-  const contacts = await db.readData()
-  const newContact = {
-    id: uuidv4(),
-    ...body,
-  }
-  contacts.push(newContact);
-  await db.writeData(contacts);
-  return newContact;
-}
+const addContact = async body => {
+  const result = await Contacts.create(body)
+  return result
+};
 
-const updateContact = async (contactId, body) => {
-  const contacts = await db.readData()
-  const index = contacts.findIndex((contact) => contact.id.toString() === contactId.toString())
-  if (index !== -1) {
-    contacts[index] = { ...contacts[index], ...body }
-    await db.writeData(contacts)
-    return contacts[index];
-  }
-  return null;
-}
+const updateContact = async (id, body) => {
+  const result = await Contacts.findByIdAndUpdate({ _id: id }, {...body}, {new: true})
+  return result
+};
+
+const updateStatusContact = async (id, body) => {
+  const { favorite } = body
+  const result = await Contacts.findByIdAndUpdate({ _id: id }, { favorite }, { new: true });
+  return result;
+};
 
 module.exports = {
   listContacts,
@@ -51,4 +37,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact
 }
