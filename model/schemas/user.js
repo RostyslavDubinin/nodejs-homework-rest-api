@@ -1,30 +1,25 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
-const contactSchema = new Schema(
+const userSchema = new Schema(
   {
-    name: {
+    password: {
       type: String,
-      required: [true, 'Set name for contact'],
+      required: [true, 'Password is required'],
     },
     email: {
       type: String,
+      required: [true, 'Email is required'],
+      unique: true,
     },
-    phone: {
+    subscription: {
       type: String,
+      enum: ['starter', 'pro', 'business'],
+      default: 'starter'
     },
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-    },
-    features: {
-      type: Array,
-      set: data => (!data ? [] : data),
-      get: data => data.sort(),
+    token: {
+      type: String,
+      default: null,
     },
   },
   {
@@ -47,10 +42,10 @@ const contactSchema = new Schema(
   },
 );
 
-contactSchema.path('name').validate(value => {
+userSchema.path('name').validate(value => {
   const re = /[A-Z]\w+/;
   return re.test(String(value));
 });
-const Contact = model('contacts', contactSchema);
+const User = model('user', userSchema);
 
-module.exports = Contact;
+module.exports = User;
