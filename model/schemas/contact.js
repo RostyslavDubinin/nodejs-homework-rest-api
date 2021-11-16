@@ -1,17 +1,29 @@
-const mongoose = require('mongoose');
-const { Schema, model } = mongoose;
+const { Schema, model } = require('mongoose');
+const Joi = require('joi');
 
-const contactSchema = new Schema(
+const nameRegexp = /^[a-z ,.'-]+$/i;
+const emailRegexp =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const phoneRegexp = /^\([0-9]{3}\)\s[0-9]{3}-[0-9]{4}$/;
+
+const contactSchema = Schema(
   {
     name: {
       type: String,
       required: [true, 'Set name for contact'],
+      match: nameRegexp,
     },
     email: {
       type: String,
+      required: true,
+      match: emailRegexp,
+      unique: true,
     },
     phone: {
       type: String,
+      required: true,
+      match: phoneRegexp,
+      unique: true,
     },
     favorite: {
       type: Boolean,
@@ -21,36 +33,17 @@ const contactSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'user',
     },
-    features: {
-      type: Array,
-      set: data => (!data ? [] : data),
-      get: data => data.sort(),
-    },
   },
-  {
-    versionKey: false,
-    timestamps: true,
-    toObject: {
-      virtuals: true,
-      transform: function (doc, ret) {
-        delete ret._id;
-        return ret;
-      },
-    },
-    toJSON: {
-      virtuals: true,
-      transform: function (doc, ret) {
-        delete ret._id;
-        return ret;
-      },
-    },
-  },
+  { versionKey: false, timestamps: true }
 );
 
-contactSchema.path('name').validate(value => {
-  const re = /[A-Z]\w+/;
-  return re.test(String(value));
+const joiContactSchema = Joi.object({
+  name: Joi.string().pattern(nameRegexp).required(),
+  email: Joi.string().pattern(emailRegexp).required(),
+  phone: Joi.string().pattern(phoneRegexp).required(),
+  favorite: Joi.boolean(),
 });
-const Contact = model('contacts', contactSchema);
 
-module.exports = Contact;
+const Contact = model('contact', contactSchema);
+
+module.exports = { Contact, joiContactSchema };

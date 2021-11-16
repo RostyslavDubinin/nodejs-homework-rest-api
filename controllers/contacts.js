@@ -19,35 +19,22 @@ const listContacts = async (req, res, next) => {
 };
 
 const getContactById = async (req, res, next) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-    try {
-      const userId = req.user.id;
-      const contact = await getContactById(req.params.id, userId);
-
-      if (contact) {
-        return res.json({
-          status: 'success',
-          code: 200,
-          data: {
-            contact,
-          },
-        });
-      } else {
-        return res.status(404).json({
-          status: 'error',
-          code: 404,
-          message: 'Not Found',
-        });
-      }
-    } catch (err) {
-      next(err);
-    }
-  } else {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({
       status: 'error',
       code: 400,
       message: 'such id does not exist',
     });
+  }
+  try {
+    const userId = req.user.id;
+    const contact = await getContactById(req.params.id, userId);
+    if (!contact) {
+      return res.status(404).json({ message: 'Not found' })
+    }
+    res.json({ contact })
+  } catch (error) {
+    next(error)
   }
 };
 
@@ -69,106 +56,70 @@ const addContact = async (req, res, next) => {
 };
 
 const removeContact = async (req, res, next) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-    try {
-      const userId = req.user.id;
-      const contact = await Contacts.removeContact(req.params.id, userId);
-
-      if (contact) {
-        return res.json({
-          status: 'success',
-          code: 200,
-          message: 'contact deleted',
-        });
-      } else {
-        return res.status(404).json({
-          status: 'error',
-          code: 404,
-          message: 'Not found',
-        });
-      }
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    return res.status(404).json({
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({
       status: 'error',
-      code: 404,
+      code: 400,
       message: 'such id does not exist',
     });
+  }
+  try {
+    const userId = req.user.id;
+    const contact = await Contacts.removeContact(req.params.id, userId);
+    if (!contact) {
+      return res.status(404).json({ message: 'Not found' })
+    }
+    res.json({ contact })
+  } catch (error) {
+    next(error)
   }
 };
 
 const updateContact = async (req, res, next) => {
-  if (req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
-    try {
-      const userId = req.user.id;
-      const contact = await Contacts.updateContact(
-        req.params.id,
-        req.body,
-        userId
-      );
-
-      if (contact) {
-        return res.json({
-          status: 'success',
-          code: 200,
-          data: {
-            contact,
-          },
-        });
-      } else {
-        return res.status(404).json({
-          status: 'error',
-          code: 404,
-          message: 'Not found',
-        });
-      }
-    } catch (err) {
-      next(err);
-    }
-  } else {
+  if (!req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({
       status: 'error',
       code: 400,
       message: 'such id does not exist',
     });
   }
+  try {
+    const userId = req.user.id;
+    const contact = await Contacts.updateContact(
+      req.params.id,
+      req.body,
+      userId
+    );
+    if (!contact) {
+      return res.status(404).json({ message: 'Not found' })
+    }
+    res.json({ contact })
+  } catch (error) {
+    next(error)
+  }
 };
 
 const updateStatusContact = async (req, res, next) => {
-  if (req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
-    try {
-      const userId = req.user.id;
-      const contact = await Contacts.updateStatusContact(
-        req.params.id,
-        req.body,
-        userId
-      );
-      if (contact) {
-        return res.json({
-          status: 'success',
-          code: 200,
-          data: {
-            contact,
-          },
-        });
-      } else {
-        return res.status(404).json({
-          status: 'error',
-          code: 404,
-          message: 'Not found',
-        });
-      }
-    } catch (err) {
-      next(err);
-    }
-  } else {
+  if (!req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({
       status: 'error',
       code: 400,
       message: 'such id does not exist',
     });
+  }
+  try {
+    const userId = req.user.id;
+    const contact = await Contacts.updateContact(
+      req.params.id,
+      req.body,
+      userId
+    );
+    if (!contact) {
+      return res.status(404).json({ message: 'Not found' })
+    }
+    res.json({ contact })
+  } catch (error) {
+    next(error)
   }
 };
 
