@@ -42,7 +42,7 @@ const userSchema = new Schema(
   },
 );
 
-userSchema.path('name').validate(value => {
+userSchema.path('email').validate(value => {
   const re = /[A-Z]\w+/;
   return re.test(String(value));
 });
