@@ -1,14 +1,15 @@
 const Contacts = require('../model/contacts');
 const mongoose = require('mongoose');
+const { HttpCode } = require('../helpers/constans');
 
 const listContacts = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const contacts = await Contacts.listContacts(userId);
 
-    return res.json({
+    return res.status(HttpCode.OK).json({
       status: 'success',
-      code: 200,
+      code: HttpCode.OK,
       data: {
         contacts,
       },
@@ -20,17 +21,17 @@ const listContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
+    return res.status(HttpCode.BAD_REQUEST).json({
       status: 'error',
-      code: 400,
+      code: HttpCode.BAD_REQUEST,
       message: 'such id does not exist',
     });
   }
   try {
     const userId = req.user.id;
-    const contact = await getContactById(req.params.id, userId);
+    const contact = await Contacts.getContactById(req.params.id, userId);
     if (!contact) {
-      return res.status(404).json({ message: 'Not found' })
+      return res.status(HttpCode.NOT_FOUND).json({ message: 'Not found' })
     }
     res.json({ contact })
   } catch (error) {
@@ -43,9 +44,9 @@ const addContact = async (req, res, next) => {
     const userId = req.user.id;
     const contact = await Contacts.addContact({ ...req.body, owner: userId });
 
-    return res.status(201).json({
+    return res.status(HttpCode.CREATED).json({
       status: 'success',
-      code: 201,
+      code: HttpCode.CREATED,
       data: {
         contact,
       },
@@ -57,9 +58,9 @@ const addContact = async (req, res, next) => {
 
 const removeContact = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
+    return res.status(HttpCode.BAD_REQUEST).json({
       status: 'error',
-      code: 400,
+      code: HttpCode.BAD_REQUEST,
       message: 'such id does not exist',
     });
   }
@@ -67,7 +68,7 @@ const removeContact = async (req, res, next) => {
     const userId = req.user.id;
     const contact = await Contacts.removeContact(req.params.id, userId);
     if (!contact) {
-      return res.status(404).json({ message: 'Not found' })
+      return res.status(HttpCode.NOT_FOUND).json({ message: 'Not found' })
     }
     res.json({ contact })
   } catch (error) {
@@ -77,9 +78,9 @@ const removeContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
+    return res.status(HttpCode.BAD_REQUEST).json({
       status: 'error',
-      code: 400,
+      code: HttpCode.BAD_REQUEST,
       message: 'such id does not exist',
     });
   }
@@ -91,7 +92,7 @@ const updateContact = async (req, res, next) => {
       userId
     );
     if (!contact) {
-      return res.status(404).json({ message: 'Not found' })
+      return res.status(HttpCode.NOT_FOUND).json({ message: 'Not found' })
     }
     res.json({ contact })
   } catch (error) {
@@ -101,21 +102,21 @@ const updateContact = async (req, res, next) => {
 
 const updateStatusContact = async (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-    return res.status(400).json({
+    return res.status(HttpCode.BAD_REQUEST).json({
       status: 'error',
-      code: 400,
+      code: HttpCode.BAD_REQUEST,
       message: 'such id does not exist',
     });
   }
   try {
     const userId = req.user.id;
-    const contact = await Contacts.updateContact(
+    const contact = await Contacts.updateStatusContact(
       req.params.id,
       req.body,
       userId
     );
     if (!contact) {
-      return res.status(404).json({ message: 'Not found' })
+      return res.status(HttpCode.NOT_FOUND).json({ message: 'Not found' })
     }
     res.json({ contact })
   } catch (error) {

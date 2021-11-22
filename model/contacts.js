@@ -17,7 +17,7 @@ const getContactById = async (id,userId) => {
 };
 
 const removeContact = async (id,userId) => {
-  const result = await Contact.findByIdAndRemove({ id,owner: userId });
+  const result = await Contact.findOneAndRemove({ id,owner: userId });
   return result;
 };
 
@@ -27,13 +27,13 @@ const addContact = async (body) => {
 };
 
 const updateContact = async (id, body, userId) => {
-  const result = await Contact.findByIdAndUpdate({ id, owner: userId }, { ...body }, { new: true })
+  const result = await Contact.findOneAndUpdate({ id, owner: userId }, { ...body }, { new: true })
   return result
 };
 
 const updateStatusContact = async (id, body, userId) => {
   const { favorite } = body
-  const result = await Contact.findByIdAndUpdate({ id, owner: userId }, { favorite }, { new: true });
+  const result = await Contact.findOneAndUpdate({ id, owner: userId }, { favorite }, { new: true });
   return result;
 };
 
