@@ -1,5 +1,10 @@
 const jwt = require('jsonwebtoken');
-const Users = require('../model/users');
+const {
+  findByEmail,
+  findById,
+  create,
+  updateToken,
+} = require('../model/users');
 const { HttpCode } = require('../helpers/constans');
 require('dotenv').config();
 const secret = process.env.SECRET;
@@ -7,7 +12,7 @@ const secret = process.env.SECRET;
 const signup = async (req, res, next) => {
   try {
     const { email } = req.body;
-    const user = await Users.findByEmail(email);
+    const user = await findByEmail(email);
 
     if (user) {
       return res.status(HttpCode.CONFLICT).json({
@@ -17,7 +22,7 @@ const signup = async (req, res, next) => {
         message: 'Email already use',
       });
     }
-    const newUser = await Users.create(req.body);
+    const newUser = await create(req.body);
 
     return res.status(HttpCode.CREATED).json({
       status: 'success',
@@ -35,7 +40,7 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await Users.findByEmail(email);
+    const user = await findByEmail(email);
 
     if (!user || !user.comparePassword(password)) {
       return res.status(HttpCode.UNAUTHORIZED).json({
@@ -48,7 +53,7 @@ const login = async (req, res, next) => {
     const id = user._id;
     const payload = { id };
     const token = jwt.sign(payload, secret, { expiresIn: '2h' });
-    await Users.updateToken(id, token);
+    await updateToken(id, token);
 
     return res.status(HttpCode.OK).json({
       status: 'success',
@@ -68,23 +73,15 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   const id = req.user.id;
-  await Users.updateToken(id, null);
+  await updateToken(id, null);
 
   return res.status(HttpCode.NO_CONTENT).json({});
 };
 
 const currentUser = async (req, res, next) => {
   try {
-    if (!req.user) {
-      return res.status(HttpCode.UNAUTHORIZED).json({
-        status: 'error',
-        code: HttpCode.UNAUTHORIZED,
-        data: 'UNAUTHORIZED',
-        message: 'Not authorized',
-      });
-    }
     const id = req.user.id;
-    const currentUser = await Users.findById(id);
+    const currentUser = await findById(id);
 
     return res.status(HttpCode.OK).json({
       status: 'success',

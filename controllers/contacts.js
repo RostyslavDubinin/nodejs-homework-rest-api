@@ -76,7 +76,7 @@ const removeContact = async (req, res, next) => {
 };
 
 const updateContact = async (req, res, next) => {
-  if (!req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({
       status: 'error',
       code: 400,
@@ -100,7 +100,7 @@ const updateContact = async (req, res, next) => {
 };
 
 const updateStatusContact = async (req, res, next) => {
-  if (!req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({
       status: 'error',
       code: 400,

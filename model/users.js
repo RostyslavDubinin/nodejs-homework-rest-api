@@ -9,7 +9,8 @@ const findById = async (id) => {
 };
 
 const create = async ({ email, password }) => {
-  const user = new User({ email, password });
+  const user = new User({ email });
+  user.setPassword(password);
   return user.save();
 };
 
