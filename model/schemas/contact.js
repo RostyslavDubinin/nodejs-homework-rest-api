@@ -1,52 +1,26 @@
-const mongoose = require('mongoose');
-const { Schema, model } = mongoose;
+const { Schema, model } = require('mongoose');
 
-const contactsSchema = new Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Set name for contact'],
-    },
-    email: {
-      type: String,
-    },
-    phone: {
-      type: String,
-    },
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
-    features: {
-      type: Array,
-      set: data => (!data ? [] : data),
-      get: data => data.sort(),
-    },
+const contactSchema = Schema({
+  name: {
+    type: String,
+    required: [true, 'Set name for contact'],
   },
-  {
-    versionKey: false,
-    timestamps: true,
-    toObject: {
-      virtuals: true,
-      transform: function (doc, ret) {
-        delete ret._id;
-        return ret;
-      },
-    },
-    toJSON: {
-      virtuals: true,
-      transform: function (doc, ret) {
-        delete ret._id;
-        return ret;
-      },
-    },
+  email: {
+    type: String,
   },
-);
+  phone: {
+    type: String,
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+  }
+}, { versionKey: false, timestamps: true });
 
-contactsSchema.path('name').validate(value => {
-  const re = /[A-Z]\w+/;
-  return re.test(String(value));
-});
-const Contacts = model('contacts', contactsSchema);
+const Contact = model('contact', contactSchema);
 
-module.exports = Contacts;
+module.exports = Contact;

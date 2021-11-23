@@ -62,3 +62,4 @@ module.exports = {
     return await validate(schemaStatusContact, req.body, next);
   },
 };
+
