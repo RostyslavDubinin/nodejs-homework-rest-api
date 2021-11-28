@@ -10,7 +10,7 @@ const findById = async (id) => {
 };
 
 const create = async ({ email, password }) => {
-  const avatarURL = gravatar.url(email);
+  const avatarURL = gravatar.url(email, { s: '250' }, true);
   const user = new User({ email, avatarURL });
   user.setPassword(password);
   return user.save();
