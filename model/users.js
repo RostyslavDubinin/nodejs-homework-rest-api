@@ -1,4 +1,5 @@
 const User = require('./schemas/user');
+const gravatar = require('gravatar');
 
 const findByEmail = async (email) => {
   return User.findOne({ email });
@@ -9,7 +10,8 @@ const findById = async (id) => {
 };
 
 const create = async ({ email, password }) => {
-  const user = new User({ email });
+  const avatarURL = gravatar.url(email, { s: '250' }, true);
+  const user = new User({ email, avatarURL });
   user.setPassword(password);
   return user.save();
 };
