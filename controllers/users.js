@@ -42,12 +42,12 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await findByEmail(email);
 
-    if (!user || !user.comparePassword(password)) {
+    if (!user || !user.verify || !user.comparePassword(password)) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
         data: 'UNAUTHORIZED',
-        message: 'Email or password is wrong',
+        message: 'Email or password is wrong, or email is not verified',
       });
     }
     const id = user._id;
